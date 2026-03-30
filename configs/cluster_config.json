@@ -1,0 +1,61 @@
+{
+  "_comment": "Cluster config for production Delta Lake pipelines",
+  "_runtime": "Databricks Runtime 13.3 LTS (Spark 3.4, Scala 2.12)",
+
+  "streaming_cluster": {
+    "cluster_name": "delta-streaming-prod",
+    "spark_version": "13.3.x-scala2.12",
+    "node_type_id": "m5d.2xlarge",
+    "num_workers": 4,
+    "autoscale": {
+      "min_workers": 2,
+      "max_workers": 8
+    },
+    "spark_conf": {
+      "spark.databricks.delta.optimizeWrite.enabled": "true",
+      "spark.databricks.delta.autoCompact.enabled": "true",
+      "spark.databricks.delta.autoCompact.minNumFiles": "50",
+      "spark.databricks.delta.optimizeWrite.binSize": "134217728",
+      "spark.sql.streaming.stateStore.providerClass": "com.databricks.sql.streaming.state.RocksDBStateStoreProvider",
+      "spark.databricks.streaming.statefulOperator.asyncCheckpoint.enabled": "true",
+      "spark.sql.shuffle.partitions": "auto",
+      "spark.databricks.adaptive.autoOptimizeShuffle.enabled": "true"
+    },
+    "spark_env_vars": {
+      "PYSPARK_PYTHON": "/databricks/python3/bin/python3"
+    },
+    "init_scripts": [
+      {
+        "workspace": {
+          "destination": "/Shared/init_scripts/install_deps.sh"
+        }
+      }
+    ],
+    "cluster_log_conf": {
+      "dbfs": {
+        "destination": "dbfs:/cluster-logs/delta-streaming-prod"
+      }
+    }
+  },
+
+  "batch_cluster": {
+    "cluster_name": "delta-batch-prod",
+    "spark_version": "13.3.x-scala2.12",
+    "node_type_id": "m5.4xlarge",
+    "num_workers": 8,
+    "spark_conf": {
+      "spark.databricks.delta.optimizeWrite.enabled": "true",
+      "spark.sql.shuffle.partitions": "auto",
+      "spark.databricks.adaptive.autoOptimizeShuffle.enabled": "true",
+      "spark.databricks.delta.merge.enableLowShuffle": "true"
+    }
+  },
+
+  "maintenance_cluster": {
+    "cluster_name": "delta-maintenance",
+    "spark_version": "13.3.x-scala2.12",
+    "node_type_id": "m5.xlarge",
+    "num_workers": 2,
+    "_note": "Used exclusively for OPTIMIZE and VACUUM jobs — small cluster is fine"
+  }
+}

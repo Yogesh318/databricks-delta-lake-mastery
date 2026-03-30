@@ -1,0 +1,59 @@
+# table_properties.yaml
+# =====================
+# Standard Delta table property tiers for the platform.
+# Apply via: ALTER TABLE <name> SET TBLPROPERTIES (<key> = '<value>')
+#
+# Tier selection guide:
+#   bronze: raw landing, append-only, high write frequency
+#   silver: cleansed, deduped, moderate DML
+#   gold:   aggregated serving layer, mostly read
+#   regulatory: audit trail, must meet compliance retention
+
+bronze:
+  delta.autoOptimize.optimizeWrite: "true"
+  delta.autoOptimize.autoCompact: "true"
+  delta.targetFileSize: "134217728"           # 128 MB
+  delta.logRetentionDuration: "interval 14 days"
+  delta.deletedFileRetentionDuration: "interval 7 days"
+  delta.enableChangeDataFeed: "true"          # Enable for CDC consumers
+  delta.isolationLevel: "WriteSerializable"   # Default — good for most append cases
+
+silver:
+  delta.autoOptimize.optimizeWrite: "true"
+  delta.autoOptimize.autoCompact: "true"
+  delta.targetFileSize: "134217728"
+  delta.logRetentionDuration: "interval 30 days"
+  delta.deletedFileRetentionDuration: "interval 14 days"
+  delta.enableChangeDataFeed: "true"
+  delta.isolationLevel: "WriteSerializable"
+  delta.columnMapping.mode: "name"            # Enable rename/drop columns
+  delta.minReaderVersion: "2"
+  delta.minWriterVersion: "5"
+
+gold:
+  delta.autoOptimize.optimizeWrite: "true"
+  delta.targetFileSize: "268435456"           # 256 MB — larger for BI scan patterns
+  delta.logRetentionDuration: "interval 90 days"
+  delta.deletedFileRetentionDuration: "interval 30 days"
+  delta.isolationLevel: "Serializable"        # Strictest — Gold must be consistent
+  delta.columnMapping.mode: "name"
+
+regulatory:
+  delta.logRetentionDuration: "interval 365 days"
+  delta.deletedFileRetentionDuration: "interval 90 days"
+  delta.isolationLevel: "Serializable"
+  delta.columnMapping.mode: "name"
+  # Note: Check GDPR / HIPAA / SOX requirements before reducing retention
+
+# Liquid Clustering (DBR 13.3+) — set per table based on query patterns
+# Use instead of ZORDER for new tables
+liquid_clustering_examples:
+  sales_fact:
+    cluster_by: ["event_date", "region", "product_category"]
+    comment: "Most queries filter on event_date + one dimension"
+  customers:
+    cluster_by: ["customer_id", "tier"]
+    comment: "Most queries are point lookups by customer_id"
+  events:
+    cluster_by: ["event_ts", "event_type", "user_id"]
+    comment: "Time-series queries with optional user filter"

@@ -1,3 +1,4 @@
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
@@ -205,3 +206,47 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+=======
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.Python
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Test & coverage
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# Databricks
+.databricks/
+*.dbc
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Data & secrets — NEVER commit
+*.env
+.env.*
+secrets/
+*.key
+*.pem
+/data/
+/tmp/
+
+# OS
+.DS_Store
+Thumbs.db
+>>>>>>> 77de8f7 (initial project setup — Delta Lake production playbook)
