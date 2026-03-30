@@ -1,6 +1,6 @@
 # databricks-delta-lake-mastery
 =======
-# 🔷 Databricks Delta Lake — Production Engineering Playbook
+#  Databricks Delta Lake — Production Engineering Playbook
 
 > **Built by a Lead Data Engineer with 11+ years of experience**  
 > Solving the hardest Delta Lake challenges encountered across Fortune 500 data platforms, financial services pipelines, and high-scale e-commerce lakehouses.
@@ -13,7 +13,7 @@
 
 ---
 
-## 📌 Why This Project Exists
+##  Why This Project Exists
 
 After a decade of building enterprise data platforms, I've seen the same hard problems appear again and again — just dressed differently. Small files killing SLA. Silent schema drift at 2am. VACUUM wiping time-travel history before an audit. CDC pipelines that look correct but lose events under load.
 
@@ -21,7 +21,7 @@ This repository is my **production playbook** — real patterns, real anti-patte
 
 ---
 
-## 🏗️ Architecture Overview
+## Architecture Overview
 
 ```
 ┌──────────────────────────────────────────────────────────────────┐
@@ -46,7 +46,7 @@ This repository is my **production playbook** — real patterns, real anti-patte
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 ```
 databricks-delta-lake-mastery/
@@ -97,7 +97,7 @@ databricks-delta-lake-mastery/
 
 ---
 
-## 🚨 The 9 Production Scenarios
+## The 9 Production Scenarios
 
 Each scenario maps to a notebook + reusable `src/` module. Click any to jump to details.
 
@@ -115,7 +115,7 @@ Each scenario maps to a notebook + reusable `src/` module. Click any to jump to 
 
 ---
 
-## ⚡ Quick Start
+## Quick Start
 
 ### Prerequisites
 
@@ -163,7 +163,7 @@ pytest tests/ -v -m integration
 
 ---
 
-## 🔬 Scenario Deep-Dives
+## Scenario Deep-Dives
 
 ### 1. Performance Degradation
 
@@ -185,8 +185,8 @@ Read path:   ZORDER on predicate columns
 Scheduled:   OPTIMIZE weekly + VACUUM monthly
 ```
 
-📓 Notebook: [`notebooks/01_performance_optimization.py`](notebooks/01_performance_optimization.py)  
-🔧 Module: [`src/utils/delta_utils.py#optimize_table`](src/utils/delta_utils.py)
+ Notebook: [`notebooks/01_performance_optimization.py`](notebooks/01_performance_optimization.py)  
+ Module: [`src/utils/delta_utils.py#optimize_table`](src/utils/delta_utils.py)
 
 ---
 
@@ -199,14 +199,14 @@ Scheduled:   OPTIMIZE weekly + VACUUM monthly
 **Production pattern:**
 ```python
 # Never do this for upserts:
-df.write.mode("append").save(path)  # ❌ duplicates on retry
+df.write.mode("append").save(path)  #  duplicates on retry
 
 # Always do this:
 delta_table.alias("t").merge(df.alias("s"), "t.id = s.id") \
-    .whenMatchedUpdateAll().whenNotMatchedInsertAll().execute()  # ✅ idempotent
+    .whenMatchedUpdateAll().whenNotMatchedInsertAll().execute()  #  idempotent
 ```
 
-📓 Notebook: [`notebooks/02_concurrent_writes_debug.py`](notebooks/02_concurrent_writes_debug.py)
+Notebook: [`notebooks/02_concurrent_writes_debug.py`](notebooks/02_concurrent_writes_debug.py)
 
 ---
 
@@ -230,8 +230,8 @@ foreachBatch MERGE into Target
 Target Silver Table (exactly-once via checkpoint)
 ```
 
-📓 Notebook: [`notebooks/03_cdc_pipeline.py`](notebooks/03_cdc_pipeline.py)  
-🔧 Module: [`src/pipelines/silver_transformation.py`](src/pipelines/silver_transformation.py)
+Notebook: [`notebooks/03_cdc_pipeline.py`](notebooks/03_cdc_pipeline.py)  
+Module: [`src/pipelines/silver_transformation.py`](src/pipelines/silver_transformation.py)
 
 ---
 
@@ -251,7 +251,7 @@ Target Silver Table (exactly-once via checkpoint)
 | Missing autoOptimize | Enable `delta.autoOptimize.optimizeWrite=true` |
 | Historical accumulation | One-time `OPTIMIZE` + enable Liquid Clustering |
 
-📓 Notebook: [`notebooks/04_small_files_fix.py`](notebooks/04_small_files_fix.py)
+Notebook: [`notebooks/04_small_files_fix.py`](notebooks/04_small_files_fix.py)
 
 ---
 
@@ -262,20 +262,20 @@ Target Silver Table (exactly-once via checkpoint)
 **Decision tree:**
 ```
 New column added?
-  → additive: use mergeSchema=true ✅
-  → rename: enable columnMapping first ✅
+  → additive: use mergeSchema=true 
+  → rename: enable columnMapping first 
 
 Column type changed?
-  → widening (int→long): usually safe ✅
-  → narrowing (double→int): reject + alert ❌
+  → widening (int→long): usually safe 
+  → narrowing (double→int): reject + alert 
 
 Column dropped?
   → version the table contract
-  → use views to shield consumers ✅
+  → use views to shield consumers 
 ```
 
-📓 Notebook: [`notebooks/05_schema_evolution.py`](notebooks/05_schema_evolution.py)  
-🔧 Module: [`src/utils/schema_utils.py`](src/utils/schema_utils.py)
+ Notebook: [`notebooks/05_schema_evolution.py`](notebooks/05_schema_evolution.py)  
+ Module: [`src/utils/schema_utils.py`](src/utils/schema_utils.py)
 
 ---
 
@@ -291,8 +291,8 @@ Silver (streaming, 2-min lag)
 UNION VIEW combines both → single endpoint for consumers
 ```
 
-📓 Notebook: [`notebooks/06_medallion_architecture.py`](notebooks/06_medallion_architecture.py)  
-🔧 Modules: [`src/pipelines/`](src/pipelines/)
+ Notebook: [`notebooks/06_medallion_architecture.py`](notebooks/06_medallion_architecture.py)  
+ Modules: [`src/pipelines/`](src/pipelines/)
 
 ---
 
@@ -311,7 +311,7 @@ UNION VIEW combines both → single endpoint for consumers
 **Use Parquet when:** Write-once archival, pure ML training sets, no DML ever needed.  
 **Use Delta when:** Any DML, streaming, schema changes, audit requirements.
 
-📓 Notebook: [`notebooks/07_delta_vs_parquet.py`](notebooks/07_delta_vs_parquet.py)
+ Notebook: [`notebooks/07_delta_vs_parquet.py`](notebooks/07_delta_vs_parquet.py)
 
 ---
 
@@ -336,8 +336,8 @@ for attempt in range(max_retries):
         time.sleep((2 ** attempt) + random.uniform(0, 1))
 ```
 
-📓 Notebook: [`notebooks/08_concurrent_jobs.py`](notebooks/08_concurrent_jobs.py)  
-🔧 Module: [`src/utils/delta_utils.py#safe_merge`](src/utils/delta_utils.py)
+ Notebook: [`notebooks/08_concurrent_jobs.py`](notebooks/08_concurrent_jobs.py)  
+ Module: [`src/utils/delta_utils.py#safe_merge`](src/utils/delta_utils.py)
 
 ---
 
@@ -358,11 +358,11 @@ for attempt in range(max_retries):
 | Gold | 90 days | 30 days | Audit + regulatory buffer |
 | Regulatory | 365 days | 90 days | Check GDPR/HIPAA requirements |
 
-📓 Notebook: [`notebooks/09_vacuum_governance.py`](notebooks/09_vacuum_governance.py)
+ Notebook: [`notebooks/09_vacuum_governance.py`](notebooks/09_vacuum_governance.py)
 
 ---
 
-## 🧠 Key Design Principles
+##  Key Design Principles
 
 1. **Idempotency everywhere** — every pipeline should produce identical results on re-run
 2. **Schema contracts** — define and enforce before consumers depend on them
@@ -381,7 +381,7 @@ for attempt in range(max_retries):
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 PRs welcome. Please:
 1. Add/update the relevant test in `tests/`
@@ -390,7 +390,7 @@ PRs welcome. Please:
 
 ---
 
-## 📄 License
+##  License
 
 MIT — use freely, attribution appreciated.
 
